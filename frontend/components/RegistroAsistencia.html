@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Asistencia</title>
+    <?!= include('frontend/config/cdn') ?>
+</head>
+<body>
+    <div id="registro-asistencia" class="p-5">
+        <h1 class="text-3xl font-bold mb-5">Registro de Asistencia</h1>
+        <div id="info-materia" class="space-y-2 mb-4">
+            <div><strong>Materia:</strong> <span id="materia"></span></div>
+            <div><strong>Semestre:</strong> <span id="semestre"></span></div>
+            <div><strong>Grupo:</strong> <span id="grupo"></span></div>
+            <div><strong>Fecha:</strong> <span id="fecha"></span></div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label for="hora-inicio">Hora de inicio:</label>
+                <input type="time" id="hora-inicio" class="border p-2 rounded">
+            </div>
+
+            <div>
+                <label for="hora-fin">Hora de finalización:</label>
+                <input type="time" id="hora-fin" class="border p-2 rounded">
+            </div>
+
+            <table id="tabla-alumnos" class="w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="border p-2">Alumno</th>
+                        <th class="border p-2">Falta</th>
+                        <th class="border p-2">Retardo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se generarán las filas de los alumnos dinámicamente -->
+                </tbody>
+            </table>
+
+            <div>
+                <label for="observaciones">Observaciones:</label>
+                <textarea id="observaciones" rows="4" class="w-full border p-2 rounded"></textarea>
+            </div>
+
+            <button id="guardar-asistencia" class="bg-blue-500 text-white px-4 py-2 rounded">
+                Guardar Asistencia
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const semestre = params.get('semestre');
+        const materia = params.get('materia');
+        const grupo = params.get('grupo');
+
+        // Mostrar información de la materia
+        document.getElementById('materia').textContent = materia;
+        document.getElementById('semestre').textContent = semestre;
+        document.getElementById('grupo').textContent = grupo;
+        document.getElementById('fecha').textContent = new Date().toLocaleDateString();
+
+        // Lista de alumnos (ejemplo)
+        const alumnos = ["Juan", "Pedro", "María", "Karina"];
+
+        // Generar filas de la tabla de alumnos
+        const tbody = document.querySelector('#tabla-alumnos tbody');
+        alumnos.forEach(alumno => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="border p-2">${alumno}</td>
+                <td class="border p-2 text-center">
+                    <input type="checkbox" class="falta" data-alumno="${alumno}">
+                </td>
+                <td class="border p-2 text-center">
+                    <input type="checkbox" class="retardo" data-alumno="${alumno}">
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Manejar el evento de guardar asistencia
+        document.getElementById('guardar-asistencia').addEventListener('click', () => {
+            const horaInicio = document.getElementById('hora-inicio').value;
+            const horaFin = document.getElementById('hora-fin').value;
+            const observaciones = document.getElementById('observaciones').value;
+
+            const asistencias = [];
+            document.querySelectorAll('#tabla-alumnos tbody tr').forEach(row => {
+                const alumno = row.querySelector('td').textContent;
+                const falta = row.querySelector('.falta').checked;
+                const retardo = row.querySelector('.retardo').checked;
+
+                asistencias.push({ alumno, falta, retardo });
+            });
+
+            const registro = {
+                semestre,
+                materia,
+                grupo,
+                fecha: new Date().toLocaleDateString(),
+                horaInicio,
+                horaFin,
+                asistencias,
+                observaciones,
+            };
+
+            console.log("Registro guardado:", registro);
+            alert("La asistencia se ha registrado correctamente.");
+            window.location.href = "/"; // Redirigir al inicio
+        });
+    </script>
+</body>
+</html>

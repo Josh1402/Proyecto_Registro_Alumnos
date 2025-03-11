@@ -1,12 +1,78 @@
 //<script type="text/jsx">
 
 
-    function Inicio() {
-      return (
-        <div>milly estuvo aqui 2 :3</div>
-      )
+function Inicio() {
+  const [semestre, setSemestre] = useState(null);
+  const [materia, setMateria] = useState(null);
+  const [grupo, setGrupo] = useState(null);
+
+  const semestres = [1, 2, 3, 4, 5, 6]; // Ejemplo de semestres
+  const materias = ["Matemáticas", "Historia", "Física"]; // Ejemplo de materias
+  const grupos = ["A", "B", "C"]; // Ejemplo de grupos
+
+  const handleRegistrarAsistencia = () => {
+    if (semestre && materia && grupo) {
+      // Redirigir al formulario de registro de asistencia
+      window.location.href = `/registro-asistencia/${semestre}/${materia}/${grupo}`;
+    } else {
+      notification.error({
+        message: "Error",
+        description: "Por favor, selecciona semestre, materia y grupo.",
+      });
     }
-    
-    
-    
-    //</script">
+  };
+
+  return (
+    <div className="p-5">
+      <h1 className="text-3xl font-bold mb-5">Registro de Asistencia</h1>
+      <div className="space-y-4">
+        <Select
+          placeholder="Selecciona el semestre"
+          style={{ width: "100%" }}
+          onChange={(value) => setSemestre(value)}
+        >
+          {semestres.map((sem) => (
+            <Option key={sem} value={sem}>
+              Semestre {sem}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Selecciona la materia"
+          style={{ width: "100%" }}
+          onChange={(value) => setMateria(value)}
+        >
+          {materias.map((mat) => (
+            <Option key={mat} value={mat}>
+              {mat}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Selecciona el grupo"
+          style={{ width: "100%" }}
+          onChange={(value) => setGrupo(value)}
+        >
+          {grupos.map((grp) => (
+            <Option key={grp} value={grp}>
+              Grupo {grp}
+            </Option>
+          ))}
+        </Select>
+
+        <Button
+          type="primary"
+          onClick={handleRegistrarAsistencia}
+          disabled={!semestre || !materia || !grupo}
+        >
+          Registrar Asistencia
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+
+//</script">
