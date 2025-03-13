@@ -1,25 +1,23 @@
 //<script type="text/jsx">
 
-
 function Inicio() {
   const [semestre, setSemestre] = useState(null);
   const [materia, setMateria] = useState(null);
   const [grupo, setGrupo] = useState(null);
+
+  const history = useHistory();// Obtén la instancia de history
 
   const semestres = [1, 2, 3, 4, 5, 6]; // Ejemplo de semestres
   const materias = ["Matemáticas", "Historia", "Física"]; // Ejemplo de materias
   const grupos = ["A", "B", "C"]; // Ejemplo de grupos
 
   const handleRegistrarAsistencia = () => {
-    if (semestre && materia && grupo) {
-      // Redirigir al formulario de registro de asistencia
-      window.location.href = `/registro-asistencia/${semestre}/${materia}/${grupo}`;
-    } else {
-      notification.error({
-        message: "Error",
-        description: "Por favor, selecciona semestre, materia y grupo.",
-      });
-    }
+    // Guarda las selecciones en el estado de la navegación
+    history.push("/registroReportes", {
+      semestre,
+      materia,
+      grupo,
+    });
   };
 
   return (
@@ -64,8 +62,8 @@ function Inicio() {
 
         <Button
           type="primary"
-          onClick={handleRegistrarAsistencia}
           disabled={!semestre || !materia || !grupo}
+          onClick={handleRegistrarAsistencia} // Asigna la función al evento onClick
         >
           Registrar Asistencia
         </Button>
@@ -73,6 +71,4 @@ function Inicio() {
     </div>
   );
 }
-
-
-//</script">
+    //</script">
