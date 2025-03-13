@@ -11,7 +11,7 @@ function registroReportes() {
     const [fecha, setFecha] = useState("");
     
     const location = useLocation(); // Obtén la ubicación actual
-  const { state } = location; // Accede al estado de la navegación
+    const { state } = location; // Accede al estado de la navegación
 
   // Si hay un estado, actualiza las selecciones
   useEffect(() => {
@@ -41,18 +41,36 @@ function registroReportes() {
     const semestres = [1, 2, 3, 4, 5, 6];
     const materias = ["Matemáticas", "Historia", "Física"];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
       console.log("Formulario enviado");
 
-      // Limpiar los campos después de enviar el formulario
-      setSemestre(null);
-      setMateria(null);
-      setGrupo(null);
-      setHoraInicio("");
-      setHoraFin("");
-      setObservaciones("");
-      setFecha("");
+      const formData = {
+        semestre,
+        materia,
+        grupo,
+        fecha,
+        horaInicio,
+        horaFin,
+        observaciones
+      };
+
+      try {
+        const response = await google.script.run.withSuccessHandler(() => {
+          // Limpiar los campos después de enviar el formulario
+          setSemestre(null);
+          setMateria(null);
+          setGrupo(null);
+          setHoraInicio("");
+          setHoraFin("");
+          setObservaciones("");
+          setFecha("");
+        }).myFunction(formData);
+
+        console.log("Datos enviados correctamente");
+      } catch (error) {
+        console.error("Error al enviar los datos:", error);
+      }
     };
 
     const isCurrentDate = fecha === moment().format("YYYY-MM-DD");

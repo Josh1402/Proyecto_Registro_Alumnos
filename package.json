@@ -1,24 +1,17 @@
 {
-  "name": "computo-en-la-nuve",
+  "name": "registro-alumnos",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jonathan-perez-117/Computo-en-la-nuve.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/jonathan-perez-117/Computo-en-la-nuve/issues"
-  },
-  "homepage": "https://github.com/jonathan-perez-117/Computo-en-la-nuve#readme",
+  "description": "",
   "dependencies": {
-    "@types/google-apps-script": "^1.0.97"
+    "@types/google-apps-script": "^1.0.97",
+    "react-router-dom": "^7.3.0",
+    "tailwindcss": "^4.0.11"
   }
 }
