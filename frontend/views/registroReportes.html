@@ -2,229 +2,227 @@
 
 
 function registroReportes() {
-    const [semestre, setSemestre] = useState(null);
-    const [materia, setMateria] = useState(null);
-    const [grupo, setGrupo] = useState(null);
-    const [horaInicio, setHoraInicio] = useState("");
-    const [horaFin, setHoraFin] = useState("");
-    const [observaciones, setObservaciones] = useState("");
-    const [fecha, setFecha] = useState("");
-    
-    const location = useLocation(); // Obtén la ubicación actual
-    const { state } = location; // Accede al estado de la navegación
+  const [semestre, setSemestre] = useState(null);
+  const [materia, setMateria] = useState(null);
+  const [grupo, setGrupo] = useState(null);
+  const [horaInicio, setHoraInicio] = useState("");
+  const [horaFin, setHoraFin] = useState("");
+  const [observaciones, setObservaciones] = useState("");
+  const [fecha, setFecha] = useState("");
+  const [alumnos, setAlumnos] = useState([]); // Estado para almacenar los nombres de los alumnos
 
-  // Si hay un estado, actualiza las selecciones
+  const location = useLocation(); // Obtén la ubicación actual
+  const { state } = location; // Accede al estado de la navegación
+
   useEffect(() => {
     if (state) {
       setSemestre(state.semestre);
       setMateria(state.materia);
       setGrupo(state.grupo);
     }
+
+    // Obtener los nombres de los alumnos desde la hoja de cálculo
+    google.script.run.withSuccessHandler((alumnosFromSheet) => {
+      setAlumnos(alumnosFromSheet);
+    }).obtenerNombresAlumnos();
+
   }, [state]);
 
 
-    const docentes = {
-      "Matemáticas": "Carlos Alejandro",
-      "Historia": "Carlos Alejandro",
-      "Física": "Carlos Alejandro"
+  const docentes = {
+    "Matemáticas": "Carlos Alejandro",
+    "Historia": "Carlos Alejandro",
+    "Física": "Carlos Alejandro"
+  };
+
+  const grupos = ["A", "B", "C"];
+  const semestres = [1, 2, 3, 4, 5, 6];
+  const materias = ["Matemáticas", "Historia", "Física"];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Formulario enviado");
+
+    const formData = {
+      semestre,
+      materia,
+      grupo,
+      fecha,
+      horaInicio,
+      horaFin,
+      observaciones
     };
 
-    const alumnos = [
-      "Juan Sierra", 
-      "Manuel Sanchez", 
-      "Pedro Gongora", 
-      "Maria Newton", 
-      "Nelsy Dolores"
-    ];
+    try {
+      const response = await google.script.run.withSuccessHandler(() => {
+        // Limpiar los campos después de enviar el formulario
+        setSemestre(null);
+        setMateria(null);
+        setGrupo(null);
+        setHoraInicio("");
+        setHoraFin("");
+        setObservaciones("");
+        setFecha("");
+      }).myFunction(formData);
 
-    const grupos = ["A", "B", "C"];
-    const semestres = [1, 2, 3, 4, 5, 6];
-    const materias = ["Matemáticas", "Historia", "Física"];
+      console.log("Datos enviados correctamente");
+    } catch (error) {
+      console.error("Error al enviar los datos:", error);
+    }
+  };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      console.log("Formulario enviado");
+  const isCurrentDate = fecha === moment().format("YYYY-MM-DD");
 
-      const formData = {
-        semestre,
-        materia,
-        grupo,
-        fecha,
-        horaInicio,
-        horaFin,
-        observaciones
-      };
+  return (
+    <div className="p-5">
+      <h1 className="text-3xl font-bold mb-5">Registro de Reporte</h1>
 
-      try {
-        const response = await google.script.run.withSuccessHandler(() => {
-          // Limpiar los campos después de enviar el formulario
-          setSemestre(null);
-          setMateria(null);
-          setGrupo(null);
-          setHoraInicio("");
-          setHoraFin("");
-          setObservaciones("");
-          setFecha("");
-        }).myFunction(formData);
+      {/* Botón Enviar en la parte superior derecha */}
+      <div className="flex justify-end mb-4">
+        <Button type="primary" htmlType="submit" form="formReporte">
+          Enviar Reporte
+        </Button>
+      </div>
 
-        console.log("Datos enviados correctamente");
-      } catch (error) {
-        console.error("Error al enviar los datos:", error);
-      }
-    };
+      {/* Materia y docente */}
+      <div>
+        <label className="block text-lg font-medium mb-2">Materia</label>
+        <Select
+          value={materia}
+          placeholder="Selecciona la materia"
+          style={{ width: "100%" }}
+          onChange={(value) => setMateria(value)}
+        >
+          {materias.map((mat) => (
+            <Option key={mat} value={mat}>
+              {mat}
+            </Option>
+          ))}
+        </Select>
+        <div className="mt-2 text-gray-600">
+          <strong>Docente:</strong> {docentes[materia] || "Carlos Alejandro"}
+        </div>
+      </div>
 
-    const isCurrentDate = fecha === moment().format("YYYY-MM-DD");
+      <form id="formReporte" onSubmit={handleSubmit} className="space-y-6">
 
-    return (
-      <div className="p-5">
-        <h1 className="text-3xl font-bold mb-5">Registro de Reporte</h1>
-
-        {/* Botón Enviar en la parte superior derecha */}
-        <div className="flex justify-end mb-4">
-          <Button type="primary" htmlType="submit" form="formReporte">
-            Enviar Reporte
-          </Button>
+        {/* Semestre y grupo */}
+        <div>
+          <label className="block text-lg font-medium mb-2">Semestre</label>
+          <Select
+            value={semestre}
+            placeholder="Selecciona el semestre"
+            style={{ width: "100%" }}
+            onChange={(value) => setSemestre(value)}
+          >
+            {semestres.map((sem) => (
+              <Option key={sem} value={sem}>
+                Semestre {sem}
+              </Option>
+            ))}
+          </Select>
         </div>
 
-         {/* Materia y docente */}
-         <div>
-            <label className="block text-lg font-medium mb-2">Materia</label>
-            <Select
-              value={materia}
-              placeholder="Selecciona la materia"
-              style={{ width: "100%" }}
-              onChange={(value) => setMateria(value)}
-              >
-              {materias.map((mat) => (
-                <Option key={mat} value={mat}>
-                  {mat}
-                </Option>
-              ))}
-            </Select>
-            <div className="mt-2 text-gray-600">
-              <strong>Docente:</strong> {docentes[materia] || "Carlos Alejandro"}
-            </div>
-          </div>
+        <div>
+          <label className="block text-lg font-medium mb-2">Grupo</label>
+          <Select
+            value={grupo}
+            placeholder="Selecciona el grupo"
+            style={{ width: "100%" }}
+            onChange={(value) => setGrupo(value)}
+          >
+            {grupos.map((grp) => (
+              <Option key={grp} value={grp}>
+                Grupo {grp}
+              </Option>
+            ))}
+          </Select>
+        </div>
 
-        <form id="formReporte" onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* Semestre y grupo */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Semestre</label>
-            <Select
-              value={semestre}
-              placeholder="Selecciona el semestre"
-              style={{ width: "100%" }}
-              onChange={(value) => setSemestre(value)}
-            >
-              {semestres.map((sem) => (
-                <Option key={sem} value={sem}>
-                  Semestre {sem}
-                </Option>
-              ))}
-            </Select>
-          </div>
-
-          <div>
-            <label className="block text-lg font-medium mb-2">Grupo</label>
-            <Select
-              value={grupo}
-              placeholder="Selecciona el grupo"
-              style={{ width: "100%" }}
-              onChange={(value) => setGrupo(value)}
-            >
-              {grupos.map((grp) => (
-                <Option key={grp} value={grp}>
-                  Grupo {grp}
-                </Option>
-              ))}
-            </Select>
-          </div>
-
-          {/* Fecha */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Fecha</label>
-            {isCurrentDate ? (
-              <Input value="Fecha Actual" disabled className="mb-2" />
-            ) : (
-              <Input
-                type="date"
-                value={fecha}
-                onChange={(e) => setFecha(e.target.value)}
-                style={{ width: "100%" }}
-              />
-            )}
-          </div>
-
-          {/* Hora de inicio */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Hora de inicio</label>
+        {/* Fecha */}
+        <div>
+          <label className="block text-lg font-medium mb-2">Fecha</label>
+          {isCurrentDate ? (
+            <Input value="Fecha Actual" disabled className="mb-2" />
+          ) : (
             <Input
-              type="time"
-              value={horaInicio}
-              onChange={(e) => setHoraInicio(e.target.value)}
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
               style={{ width: "100%" }}
             />
-          </div>
+          )}
+        </div>
 
-          {/* Hora de finalización */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Hora de finalización</label>
-            <Input
-              type="time"
-              value={horaFin}
-              onChange={(e) => setHoraFin(e.target.value)}
-              style={{ width: "100%" }}
-            />
-          </div>
+        {/* Hora de inicio */}
+        <div>
+          <label className="block text-lg font-medium mb-2">Hora de inicio</label>
+          <Input
+            type="time"
+            value={horaInicio}
+            onChange={(e) => setHoraInicio(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
 
-          {/* Lista de alumnos */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Alumnos</label>
-            <div className="overflow-x-auto">
-              <table className="min-w-full table-auto">
-                <thead>
-                  <tr>
+        {/* Hora de finalización */}
+        <div>
+          <label className="block text-lg font-medium mb-2">Hora de finalización</label>
+          <Input
+            type="time"
+            value={horaFin}
+            onChange={(e) => setHoraFin(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
+
+        {/* Lista de alumnos */}
+        <div>
+    <label className="block text-lg font-medium mb-2">Alumnos</label>
+    <div className="overflow-x-auto">
+        <table className="min-w-full table-auto">
+            <thead>
+                <tr>
                     <th className="px-4 py-2 text-left">Alumno</th>
                     <th className="px-4 py-2 text-left">Falta</th>
                     <th className="px-4 py-2 text-left">Retardo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {alumnos.map((alumno, index) => (
+                </tr>
+            </thead>
+            <tbody>
+                {alumnos.map((alumno, index) => (
                     <tr key={index} className="border-t">
-                      <td className="px-4 py-2">{alumno}</td>
-                      <td className="px-4 py-2">
-                        <input type="radio" name={`alumno-${index}`} value="falta" />
-                      </td>
-                      <td className="px-4 py-2">
-                        <input type="radio" name={`alumno-${index}`} value="retardo" />
-                      </td>
+                        <td className="px-4 py-2">{alumno}</td>
+                        <td className="px-4 py-2">
+                            <input type="radio" name={`alumno-${index}`} value="falta" />
+                        </td>
+                        <td className="px-4 py-2">
+                            <input type="radio" name={`alumno-${index}`} value="retardo" />
+                        </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                ))}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-          {/* Observaciones */}
-          <div>
-            <label className="block text-lg font-medium mb-2">Observaciones</label>
-            <TextArea
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              maxLength={150}
-              rows={4}
-              placeholder="Escribe tus observaciones..."
-            />
-            <div className="mt-1 text-gray-600">
-              {observaciones.length} / 150 caracteres
-            </div>
+        {/* Observaciones */}
+        <div>
+          <label className="block text-lg font-medium mb-2">Observaciones</label>
+          <TextArea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            maxLength={150}
+            rows={4}
+            placeholder="Escribe tus observaciones..."
+          />
+          <div className="mt-1 text-gray-600">
+            {observaciones.length} / 150 caracteres
           </div>
-          
-        </form>
-      </div>
-    );
-  }
-  
-  //</script">
+        </div>
+
+      </form>
+    </div>
+  );
+}
+
+//</script">
