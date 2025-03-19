@@ -1,12 +1,74 @@
 //<script type="text/jsx">
 
+function Inicio() {
+  const [semestre, setSemestre] = useState(null);
+  const [materia, setMateria] = useState(null);
+  const [grupo, setGrupo] = useState(null);
 
-    function Inicio() {
-      return (
-        <div>Esto es una prueba del branch para trabajar</div>
-      )
-    }
-    
-    
-    
+  const history = useHistory();// Obtén la instancia de history
+
+  const semestres = [1, 2, 3, 4, 5, 6]; // Ejemplo de semestres
+  const materias = ["Matemáticas", "Historia", "Física"]; // Ejemplo de materias
+  const grupos = ["A", "B", "C"]; // Ejemplo de grupos
+
+  const handleRegistrarAsistencia = () => {
+    // Guarda las selecciones en el estado de la navegación
+    history.push("/registroReportes", {
+      semestre,
+      materia,
+      grupo,
+    });
+  };
+
+  return (
+    <div className="p-5">
+      <h1 className="text-3xl font-bold mb-5">Registro de Asistencia</h1>
+      <div className="space-y-4">
+        <Select
+          placeholder="Selecciona el semestre"
+          style={{ width: "100%" }}
+          onChange={(value) => setSemestre(value)}
+        >
+          {semestres.map((sem) => (
+            <Option key={sem} value={sem}>
+              Semestre {sem}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Selecciona la materia"
+          style={{ width: "100%" }}
+          onChange={(value) => setMateria(value)}
+        >
+          {materias.map((mat) => (
+            <Option key={mat} value={mat}>
+              {mat}
+            </Option>
+          ))}
+        </Select>
+
+        <Select
+          placeholder="Selecciona el grupo"
+          style={{ width: "100%" }}
+          onChange={(value) => setGrupo(value)}
+        >
+          {grupos.map((grp) => (
+            <Option key={grp} value={grp}>
+              Grupo {grp}
+            </Option>
+          ))}
+        </Select>
+
+        <Button
+          type="primary"
+          disabled={!semestre || !materia || !grupo}
+          onClick={handleRegistrarAsistencia} // Asigna la función al evento onClick
+        >
+          Registrar Asistencia
+        </Button>
+      </div>
+    </div>
+  );
+}
     //</script">

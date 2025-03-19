@@ -9,7 +9,7 @@ const doGet = () =>
         'width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"'
       )
       .setTitle("Proyecto apps script dev")
-      .setFaviconUrl(<a href="https://www.flaticon.es/iconos-gratis/mapa-del-sitio" title="mapa del sitio iconos">Mapa del sitio iconos creados por adrianadam - Flaticon</a>);
+      .setFaviconUrl("https://image.flaticon.com/icons/png/512/953/953720.png");
   
   const include = (ruta) =>
     HtmlService.createHtmlOutputFromFile(ruta).getContent();
