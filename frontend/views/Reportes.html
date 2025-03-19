@@ -1,7 +1,10 @@
 //<script type="text/jsx">
 function Reportes() {
   const [Filtro, setFiltro] = useState(null);
-
+  const [Fechas, setFecha] =useState(null);
+  const [Materias, setMateria] =useState(null);
+  const [Alumnos, setAlumno] =useState(null);
+  
   const filtros = ["Fechas", "Materias", "Semestres", "Alumnos"];
 
   return (
@@ -10,7 +13,7 @@ function Reportes() {
       {/* Botón Enviar en la parte superior derecha */}
       <div className="text-left">
       <Select
-          placeholder="Filtrar por"
+          placeholder="Filtrar por:"
           style={{ width: "10%" }}
           onChange={(value) => setGrupo(value)}
         >
