@@ -5,9 +5,20 @@ function Inicio() {
   const [materia, setMateria] = useState(null);
   const [grupo, setGrupo] = useState(null);
 
-  const semestres = [1, 2, 3, 4, 5, 6]; // Ejemplo de semestres
+  const history = useHistory();// Obtén la instancia de history
+
+  const semestres = [1, 2, 3, 4, 5, 6, 7, 8]; // Ejemplo de semestres
   const materias = ["Matemáticas", "Historia", "Física"]; // Ejemplo de materias
   const grupos = ["A", "B", "C"]; // Ejemplo de grupos
+
+  const handleRegistrarAsistencia = () => {
+    // Guarda las selecciones en el estado de la navegación
+    history.push("/registroReportes", {
+      semestre,
+      materia,
+      grupo,
+    });
+  };
 
   return (
     <div className="p-5">
@@ -52,6 +63,7 @@ function Inicio() {
         <Button
           type="primary"
           disabled={!semestre || !materia || !grupo}
+          onClick={handleRegistrarAsistencia} // Asigna la función al evento onClick
         >
           Registrar Asistencia
         </Button>

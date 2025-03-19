@@ -1,31 +1,100 @@
 //<script type="text/jsx">
+
 function Reportes() {
-  const [Filtro, setFiltro] = useState(null);
-  const [Fechas, setFecha] =useState(null);
-  const [Materias, setMateria] =useState(null);
-  const [Alumnos, setAlumno] =useState(null);
-  
+  const [filtro, setFiltro] = useState(null); // Estado para el filtro seleccionado
+
   const filtros = ["Fechas", "Materias", "Semestres", "Alumnos"];
+
+  // Columnas de la tabla
+  const columnsfecha = [
+    {
+      title: "Fecha",
+      dataIndex: "fecha",
+      key: "fecha",
+    },
+  ];
+
+  const columnsmateria = [
+    {
+      title: "Materia",
+      dataIndex: "materia",
+      key: "materia",
+    },
+  ];
+
+  const columnssemestre = [
+    {
+      title: "Semestre",
+      dataIndex: "semestre",
+      key: "semestre",
+    },
+  ];
+
+  const columnsalumno = [
+    {
+      title: "Alumno",
+      dataIndex: "alumno",
+      key: "alumno",
+    },
+  ];
 
   return (
     <div className="p-5">
       <h1 className="text-3xl font-bold mb-5">Reportes</h1>
-      {/* Botón Enviar en la parte superior derecha */}
-      <div className="text-left">
-      <Select
-          placeholder="Filtrar por:"
-          style={{ width: "10%" }}
-          onChange={(value) => setGrupo(value)}
+
+      {/* Select para elegir el filtro */}
+      <div className="text-left mb-5">
+        <Select
+          placeholder="Filtrar por"
+          style={{ width: "20%" }} // Ajusta el ancho según sea necesario
+          onChange={(value) => setFiltro(value)} // Actualiza el estado del filtro
         >
-          {filtros.map((grp) => (
-            <Option key={grp} value={grp}>
-              Por: {grp}
+          {filtros.map((filtro) => (
+            <Option key={filtro} value={filtro}>
+              Por: {filtro}
             </Option>
           ))}
         </Select>
       </div>
+
+      {/* Mostrar la tabla solo si el filtro es "Fechas" */}
+      {filtro === "Fechas" && (
+        <Table
+          columns={columnsfecha} // Columnas de la tabla
+          dataSource={[]} // Tabla en blanco (sin datos)
+          bordered
+          pagination={false} // Desactiva la paginación
+        />
+      )}
+
+      {filtro === "Materias" && (
+        <Table
+          columns={columnsmateria} // Columnas de la tabla
+          dataSource={[]} // Tabla en blanco (sin datos)
+          bordered
+          pagination={false} // Desactiva la paginación
+        />
+      )}
+
+      {filtro === "Semestres" && (
+        <Table
+          columns={columnssemestre} // Columnas de la tabla
+          dataSource={[]} // Tabla en blanco (sin datos)
+          bordered
+          pagination={false} // Desactiva la paginación
+        />
+      )}
+
+      {filtro === "Alumnos" && (
+        <Table
+          columns={columnsalumno} // Columnas de la tabla
+          dataSource={[]} // Tabla en blanco (sin datos)
+          bordered
+          pagination={false} // Desactiva la paginación
+        />
+      )}
     </div>
-  )
+  );
 }
 
-//</script">
+//</script>

@@ -1,6 +1,5 @@
 //<script type="text/jsx">
 
-
 function registroReportes() {
   const [semestre, setSemestre] = useState(null);
   const [materia, setMateria] = useState(null);
@@ -21,7 +20,7 @@ function registroReportes() {
       setGrupo(state.grupo);
     }
 
-    // Obtener los nombres de los alumnos desde la hoja de cálculo
+    // Obtener los nombres de los alumnos desde la hoja de cálculo resgitro alumnos
     google.script.run.withSuccessHandler((alumnosFromSheet) => {
       setAlumnos(alumnosFromSheet);
     }).obtenerNombresAlumnos();

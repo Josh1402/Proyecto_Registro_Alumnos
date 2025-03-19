@@ -1,5 +1,5 @@
 function myFunction(formData) {
-    const ss = SpreadsheetApp.openById("1LGLnkGdnI7QrvdM7XOVKewebBeyjb9W4XFUyqj-voD8");
+    const ss = SpreadsheetApp.openById("1a_IZHJezqBp6b2xbqBb_UAeX6RAGi3OT");
     const sheet = ss.getSheetByName("Registro_Asistencia");
 
     const data = [
@@ -16,7 +16,7 @@ function myFunction(formData) {
 }
 
 function obtenerNombresAlumnos() {
-    const ss = SpreadsheetApp.openById("1LGLnkGdnI7QrvdM7XOVKewebBeyjb9W4XFUyqj-voD8");
+    const ss = SpreadsheetApp.openById("1a_IZHJezqBp6b2xbqBb_UAeX6RAGi3OT");
     const sheet = ss.getSheetByName("Semestre_1");
 
     // Leer los nombres de los alumnos desde la hoja de cálculo
