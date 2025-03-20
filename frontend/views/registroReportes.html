@@ -1,6 +1,6 @@
 //<script type="text/jsx">
 
-function registroReportes() { 
+function registroReportes() {
   const [semestre, setSemestre] = useState(null);
   const [materia, setMateria] = useState(null);
   const [grupo, setGrupo] = useState(null);
@@ -10,10 +10,12 @@ function registroReportes() {
   const [fecha, setFecha] = useState("");
   const [alumnos, setAlumnos] = useState([]);
   const [docente, setDocente] = useState(""); // Estado para el nombre del docente
+  const [selecciones, setSelecciones] = useState({}); // Estado para las selecciones de falta/retardo
 
   const grupos = ["A", "B", "C"];
   const semestres = [1, 2, 3, 4, 5, 6];
-  const materias = ["Computo en la Nube", "POO", "Calculo Integral"]; // Materias actualizadas
+  const materias = ["computo en la nube","Seguridad en la nube","Infraestructura de servicios en la nube",
+    "Modelado de procesos en la nube","Inteligencia de negocios en la nube", "POO", "Calculo Integral"]; // Materias actualizadas
 
   // Carga inicial de datos
   useEffect(() => {
@@ -25,12 +27,14 @@ function registroReportes() {
     }
 
     // Obtener alumnos desde Google Sheets
-    google.script.run
-      .withSuccessHandler((alumnosFromSheet) => {
-        setAlumnos(alumnosFromSheet);
-      })
-      .obtenerNombresAlumnos();
-  }, []);
+    if (semestre && grupo) {
+      google.script.run
+        .withSuccessHandler((alumnosFromSheet) => {
+          setAlumnos(alumnosFromSheet);
+        })
+        .obtenerNombresAlumnos(semestre, grupo); // Pasar semestre y grupo
+    }
+  }, [semestre, grupo]);
 
   // Obtener el docente cuando se selecciona una materia
   useEffect(() => {
@@ -49,19 +53,28 @@ function registroReportes() {
     e.preventDefault();
     console.log("Formulario enviado");
 
+    // Preparar los datos del formulario
     const formData = {
       semestre,
       materia,
       docente,
       grupo,
-      fecha: fecha || moment().format("YYYY-MM-DD"),
+      fecha: fecha || moment().format("YYYY-MM-DD"), // Usa la fecha actual si no se selecciona
       horaInicio,
       horaFin,
       observaciones,
+      asistencias: Object.entries(selecciones)
+        .filter(([alumno, seleccion]) => seleccion !== null) // Filtra solo los alumnos con selección
+        .map(([alumno, seleccion]) => ({
+          alumno,
+          seleccion,
+        })),
     };
 
+    // Enviar datos a Google Sheets
     google.script.run
       .withSuccessHandler(() => {
+        // Limpiar campos después del éxito
         setSemestre(null);
         setMateria(null);
         setDocente("");
@@ -70,6 +83,7 @@ function registroReportes() {
         setHoraFin("");
         setObservaciones("");
         setFecha("");
+        setSelecciones({}); // Limpiar las selecciones
         localStorage.removeItem("registroData");
         console.log("Datos guardados en la base de datos");
       })
@@ -200,10 +214,32 @@ function registroReportes() {
                   <tr key={index} className="border-t">
                     <td className="px-4 py-2">{alumno}</td>
                     <td className="px-4 py-2">
-                      <input type="radio" name={`alumno-${index}`} value="falta" />
+                      <input
+                        type="radio"
+                        name={`alumno-${index}`}
+                        value="falta"
+                        checked={selecciones[alumno] === "falta"}
+                        onChange={() =>
+                          setSelecciones((prev) => ({
+                            ...prev,
+                            [alumno]: "falta",
+                          }))
+                        }
+                      />
                     </td>
                     <td className="px-4 py-2">
-                      <input type="radio" name={`alumno-${index}`} value="retardo" />
+                      <input
+                        type="radio"
+                        name={`alumno-${index}`}
+                        value="retardo"
+                        checked={selecciones[alumno] === "retardo"}
+                        onChange={() =>
+                          setSelecciones((prev) => ({
+                            ...prev,
+                            [alumno]: "retardo",
+                          }))
+                        }
+                      />
                     </td>
                   </tr>
                 ))}
