@@ -1,7 +1,6 @@
 //<script type="text/jsx">
 
-
-function registroReportes() {
+function registroReportes() { 
   const [semestre, setSemestre] = useState(null);
   const [materia, setMateria] = useState(null);
   const [grupo, setGrupo] = useState(null);
@@ -9,36 +8,75 @@ function registroReportes() {
   const [horaFin, setHoraFin] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [fecha, setFecha] = useState("");
-
-  const docentes = {
-    Matemáticas: "Carlos Alejandro",
-    Historia: "Carlos Alejandro",
-    Física: "Carlos Alejandro",
-  };
-
-  const alumnos = [
-    "Juan Sierra",
-    "Manuel Sanchez",
-    "Pedro Gongora",
-    "Maria Newton",
-    "Nelsy Dolores",
-  ];
+  const [alumnos, setAlumnos] = useState([]);
+  const [docente, setDocente] = useState(""); // Estado para el nombre del docente
 
   const grupos = ["A", "B", "C"];
   const semestres = [1, 2, 3, 4, 5, 6];
-  const materias = ["Matemáticas", "Historia", "Física"];
+  const materias = ["Computo en la Nube", "POO", "Calculo Integral"]; // Materias actualizadas
+
+  // Carga inicial de datos
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("registroData"));
+    if (storedData) {
+      setSemestre(storedData.semestre);
+      setMateria(storedData.materia);
+      setGrupo(storedData.grupo);
+    }
+
+    // Obtener alumnos desde Google Sheets
+    google.script.run
+      .withSuccessHandler((alumnosFromSheet) => {
+        setAlumnos(alumnosFromSheet);
+      })
+      .obtenerNombresAlumnos();
+  }, []);
+
+  // Obtener el docente cuando se selecciona una materia
+  useEffect(() => {
+    if (materia) {
+      google.script.run
+        .withSuccessHandler((docenteFromSheet) => {
+          setDocente(docenteFromSheet);
+        })
+        .obtenerDocentePorMateria(materia);
+    } else {
+      setDocente(""); // Limpiar el docente si no hay materia seleccionada
+    }
+  }, [materia]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Formulario enviado");
-    // Limpiar los campos después de enviar el formulario
-    setSemestre(null);
-    setMateria(null);
-    setGrupo(null);
-    setHoraInicio("");
-    setHoraFin("");
-    setObservaciones("");
-    setFecha("");
+
+    const formData = {
+      semestre,
+      materia,
+      docente,
+      grupo,
+      fecha: fecha || moment().format("YYYY-MM-DD"),
+      horaInicio,
+      horaFin,
+      observaciones,
+    };
+
+    google.script.run
+      .withSuccessHandler(() => {
+        setSemestre(null);
+        setMateria(null);
+        setDocente("");
+        setGrupo(null);
+        setHoraInicio("");
+        setHoraFin("");
+        setObservaciones("");
+        setFecha("");
+        localStorage.removeItem("registroData");
+        console.log("Datos guardados en la base de datos");
+      })
+      .withFailureHandler((error) => {
+        console.error("Error al guardar:", error);
+      })
+      .myFunction(formData);
   };
 
   const isCurrentDate = fecha === moment().format("YYYY-MM-DD");
@@ -70,12 +108,11 @@ function registroReportes() {
           ))}
         </Select>
         <div className="mt-2 text-gray-600">
-          <strong>Docente:</strong> {docentes[materia] || "Carlos Alejandro"}
+          <strong>Docente:</strong> {docente || "Selecciona una materia"}
         </div>
       </div>
 
       <form id="formReporte" onSubmit={handleSubmit} className="space-y-6">
-
         {/* Semestre y grupo */}
         <div>
           <label className="block text-lg font-medium mb-2">Semestre</label>
@@ -189,7 +226,6 @@ function registroReportes() {
             {observaciones.length} / 150 caracteres
           </div>
         </div>
-
       </form>
     </div>
   );
