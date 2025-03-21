@@ -1,35 +1,35 @@
 //<script type="text/jsx">
 
-    function Header() {
+function Header() {
    
-     return (
-       <div className="shadow-2xl p-5">
-           <h2 className="text-2xl font-bold mb-3">Proyecto registro de Alumnos</h2>
-           <NavLink
-           exact
-           activeClassName="bg-blue-500"
-           className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
-           to="/">
-           Inicio
-           </NavLink>
+  return (
+    <div className="shadow-2xl p-5">
+        <h2 className="text-2xl font-bold mb-3">Proyecto registro de Alumnos</h2>
+        {/* <NavLink
+        exact
+        activeClassName="bg-blue-500"
+        className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
+        to="/">
+        Inicio
+        </NavLink> */}
 
-          <NavLink
-           exact
-           activeClassName="bg-green-500"
-           className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
-           to="/registroReportes">
-           Registro Reportes
-           </NavLink>
+        <NavLink
+        exact
+        activeClassName="bg-green-500"
+        className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
+        to="/registroReportes">
+        Registro Reportes
+        </NavLink>
 
-           <NavLink
-           exact
-           activeClassName="bg-green-500"
-           className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
-           to="/Reportes">
-           Reportes
-           </NavLink>
-       </div>
-     )
-   }
-   
-   //</script>
+        <NavLink
+        exact
+        activeClassName="bg-green-500"
+        className="mr-3 px-3 py-1 bg-blue-700 text-white rounded-2xl" 
+        to="/">
+        Reportes
+        </NavLink>
+    </div>
+  )
+}
+
+//</script>

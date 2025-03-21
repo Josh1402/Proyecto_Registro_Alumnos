@@ -1,96 +1,148 @@
 //<script type="text/jsx">
-
 function Reportes() {
-  const [filtro, setFiltro] = useState(null); // Estado para el filtro seleccionado
+  const [dataSource, setDataSource] = useState([]); // Estado para almacenar los datos
+  const [fechaFiltro, setFechaFiltro] = useState(null); // Estado para filtrar por fecha
+  const [materiaFiltro, setMateriaFiltro] = useState(null); // Estado para filtrar por materia
+  const [semestreFiltro, setSemestreFiltro] = useState(null); // Estado para filtrar por semestre
 
-  const filtros = ["Fechas", "Materias", "Semestres", "Alumnos"];
+  // Función para obtener los reportes
+  const obtenerDatos = () => {
+    google.script.run
+      .withSuccessHandler((res) => {
+        const reportes = JSON.parse(res); // Convertir la respuesta a un arreglo de objetos
+        console.log("Datos recibidos:", reportes);
+        setDataSource(reportes); // Guardar los datos en el estado
+      })
+      .withFailureHandler((error) => {
+        console.error("Error al obtener los reportes:", error);
+        setDataSource([]); // En caso de error, establecer un arreglo vacío
+      })
+      .obtenerReportes(); // Llamar a la función de Google Apps Script
+  };
 
-  // Columnas de la tabla
-  const columnsfecha = [
-    {
-      title: "Fecha",
-      dataIndex: "fecha",
-      key: "fecha",
-    },
-  ];
+  // Obtener los reportes al cargar el componente
+  useEffect(() => {
+    obtenerDatos();
+  }, []);
 
-  const columnsmateria = [
-    {
-      title: "Materia",
-      dataIndex: "materia",
-      key: "materia",
-    },
-  ];
+  // Filtrar los datos según los filtros seleccionados
+  const datosFiltrados = dataSource.filter((reporte) => {
+    const coincideFecha = fechaFiltro
+      ? new Date(reporte.Fecha).toISOString().split("T")[0] ===
+        fechaFiltro.toISOString().split("T")[0]
+      : true;
 
-  const columnssemestre = [
-    {
-      title: "Semestre",
-      dataIndex: "semestre",
-      key: "semestre",
-    },
-  ];
+    const coincideMateria = materiaFiltro
+      ? reporte.Materia === materiaFiltro
+      : true;
 
-  const columnsalumno = [
-    {
-      title: "Alumno",
-      dataIndex: "alumno",
-      key: "alumno",
-    },
+    const coincideSemestre = semestreFiltro
+      ? reporte.Semestre === Number(semestreFiltro)
+      : true;
+
+    return coincideFecha && coincideMateria && coincideSemestre;
+  });
+
+  // Obtener listas únicas para los filtros
+  const materiasUnicas = [...new Set(dataSource.map((reporte) => reporte.Materia))];
+  const semestresUnicos = [...new Set(dataSource.map((reporte) => reporte.Semestre))];
+
+  // Definir las columnas de la tabla
+  const columns = [
+    { title: "Semestre", dataIndex: "Semestre", key: "Semestre" },
+    { title: "Materia", dataIndex: "Materia", key: "Materia" },
+    { title: "Docente", dataIndex: "Docente", key: "Docente" },
+    { title: "Grupo", dataIndex: "Grupo", key: "Grupo" },
+    { title: "Fecha", dataIndex: "Fecha", key: "Fecha" },
+    { title: "Hora de inicio", dataIndex: "Hora de inicio", key: "Hora de inicio" },
+    { title: "Hora de finalización", dataIndex: "Hora de finalización", key: "Hora de finalización" },
+    { title: "Alumnos", dataIndex: "Alumnos", key: "Alumnos" },
+    { title: "Observaciones", dataIndex: "Observaciones", key: "Observaciones" },
   ];
 
   return (
     <div className="p-5">
-      <h1 className="text-3xl font-bold mb-5">Reportes</h1>
+      <h1 className="text-3xl font-bold mb-5">Reportes de Asistencia</h1>
 
-      {/* Select para elegir el filtro */}
-      <div className="text-left mb-5">
-        <Select
-          placeholder="Filtrar por"
-          style={{ width: "20%" }} // Ajusta el ancho según sea necesario
-          onChange={(value) => setFiltro(value)} // Actualiza el estado del filtro
-        >
-          {filtros.map((filtro) => (
-            <Option key={filtro} value={filtro}>
-              Por: {filtro}
-            </Option>
-          ))}
-        </Select>
+      {/* Contenedor de filtros */}
+      <div className="flex flex-wrap gap-4 mb-5">
+        {/* Filtro por fecha */}
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-lg font-medium mb-2">Filtrar por fecha:</label>
+          <input
+            type="date"
+            onChange={(e) => setFechaFiltro(new Date(e.target.value))}
+            className="w-full p-2 border rounded"
+          />
+          {fechaFiltro && (
+            <button
+              onClick={() => setFechaFiltro(null)}
+              className="mt-2 text-blue-500 hover:text-blue-700"
+            >
+              Limpiar filtro
+            </button>
+          )}
+        </div>
+
+        {/* Filtro por materia */}
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-lg font-medium mb-2">Filtrar por materia:</label>
+          <select
+            onChange={(e) => setMateriaFiltro(e.target.value)}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">Selecciona una materia</option>
+            {materiasUnicas.map((materia) => (
+              <option key={materia} value={materia}>
+                {materia}
+              </option>
+            ))}
+          </select>
+          {materiaFiltro && (
+            <button
+              onClick={() => setMateriaFiltro(null)}
+              className="mt-2 text-blue-500 hover:text-blue-700"
+            >
+              Limpiar filtro
+            </button>
+          )}
+        </div>
+
+        {/* Filtro por semestre */}
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-lg font-medium mb-2">Filtrar por semestre:</label>
+          <select
+            onChange={(e) => setSemestreFiltro(Number(e.target.value))}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">Selecciona un semestre</option>
+            {semestresUnicos.map((semestre) => (
+              <option key={semestre} value={semestre}>
+                Semestre {semestre}
+              </option>
+            ))}
+          </select>
+          {semestreFiltro && (
+            <button
+              onClick={() => setSemestreFiltro(null)}
+              className="mt-2 text-blue-500 hover:text-blue-700"
+            >
+              Limpiar filtro
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Mostrar la tabla solo si el filtro es "Fechas" */}
-      {filtro === "Fechas" && (
+      {/* Mostrar mensaje de carga si no hay datos */}
+      {dataSource.length === 0 ? (
+        <p>Cargando reportes...</p>
+      ) : (
         <Table
-          columns={columnsfecha} // Columnas de la tabla
-          dataSource={[]} // Tabla en blanco (sin datos)
-          bordered
-          pagination={false} // Desactiva la paginación
-        />
-      )}
-
-      {filtro === "Materias" && (
-        <Table
-          columns={columnsmateria} // Columnas de la tabla
-          dataSource={[]} // Tabla en blanco (sin datos)
-          bordered
-          pagination={false} // Desactiva la paginación
-        />
-      )}
-
-      {filtro === "Semestres" && (
-        <Table
-          columns={columnssemestre} // Columnas de la tabla
-          dataSource={[]} // Tabla en blanco (sin datos)
-          bordered
-          pagination={false} // Desactiva la paginación
-        />
-      )}
-
-      {filtro === "Alumnos" && (
-        <Table
-          columns={columnsalumno} // Columnas de la tabla
-          dataSource={[]} // Tabla en blanco (sin datos)
-          bordered
-          pagination={false} // Desactiva la paginación
+          dataSource={datosFiltrados.map((reporte, index) => ({
+            ...reporte,
+            key: index,
+          }))}
+          columns={columns}
         />
       )}
     </div>
